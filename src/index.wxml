@@ -1,0 +1,3 @@
+<view class="index other">{{prop}}-{{flag}}</view>
+
+<canvas id="canvas" type="2d" class="container" style="width: {{width}}px; height: {{height}}px"></canvas>
