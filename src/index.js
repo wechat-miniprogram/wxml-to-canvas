@@ -57,6 +57,8 @@ Component({
 
       ctx.clearRect(0, 0, this.data.width, this.data.height)
       const {root: xom} = xmlParse(wxml)
+
+      console.log('xom', xom)
       const widget = new Widget(xom, objStyle)
       const container = widget.init()
       this.boundary = {

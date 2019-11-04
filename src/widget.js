@@ -44,8 +44,13 @@ class Widget {
   }
 
   create(node) {
-    const className = splitLineToCamelCase(node.attributes.class)
-    const style = this.style[className] || {}
+    let classNames = (node.attributes.class || '').split(' ')
+    classNames = classNames.map(item => splitLineToCamelCase(item.trim()))
+    const style = {}
+    classNames.forEach(item => {
+      Object.assign(style, this.style[item] || {})
+    })
+
     const args = {name: node.name, style}
 
     const attrs = Object.keys(node.attributes)
