@@ -1,6 +1,6 @@
 {
-  "name": "Widget2Canvas",
-  "version": "1.0.0",
+  "name": "widget-to-canvas",
+  "version": "1.0.3",
   "description": "",
   "main": "miniprogram_dist/index.js",
   "scripts": {
@@ -35,10 +35,6 @@
   "author": "sanfordsun",
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-plugin-module-resolver": "^3.2.0",
-    "babel-preset-env": "^1.7.0",
     "colors": "^1.3.1",
     "eslint": "^5.14.1",
     "eslint-config-airbnb-base": "13.1.0",
@@ -58,7 +54,11 @@
     "through2": "^2.0.3",
     "vinyl": "^2.2.0",
     "webpack": "^4.29.5",
+    "webpack-cli": "^3.3.10",
     "webpack-node-externals": "^1.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "css-to-object": "^1.1.0",
+    "widget-ui": "^1.0.2"
+  }
 }

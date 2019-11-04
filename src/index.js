@@ -1,39 +1,94 @@
-// const _ = require('./utils')
 
+const cssToObj = require('css-to-object')
+const xmlParse = require('./xml-parser')
+const {Widget} = require('./widget')
+const {Draw} = require('./draw')
+const {splitLineToCamelCase} = require('./utils')
 
 Component({
   properties: {
-    prop: {
-      width: Number,
-      height: Number
+    width: {
+      type: Number,
+      value: 400
     },
-  },
-  data: {
-    flag: false,
+    height: {
+      type: Number,
+      value: 300
+    }
   },
   lifetimes: {
     attached() {
-      const ratio = wx.getSystemInfoSync().pixelRatio
+      const dpr = wx.getSystemInfoSync().pixelRatio
       const query = this.createSelectorQuery()
-      query.select('#canvas').node((res) => {
-        const canvas = res.node
-        const ctx = canvas.getContext('2d')
-        canvas.width = this.data.width * ratio
-        canvas.height = this.data.height * ratio
-        ctx.scale(ratio, ratio)
-      }).exec()
-    },
-    compile(tpl, data) {
+      this.dpr = dpr
+      query.select('#canvas')
+        .fields({node: true, size: true})
+        .exec(res => {
+          const canvas = res[0].node
+          const ctx = canvas.getContext('2d')
+          canvas.width = res[0].width * dpr
+          canvas.height = res[0].height * dpr
+          ctx.scale(dpr, dpr)
+          this.ctx = ctx
+          this.canvas = canvas
+        })
+    }
+  },
+  methods: {
+    async renderToCanvas(args) {
+      const {wxml, style} = args
+      const objStyle = typeof style === 'string' ? cssToObj(style, {
+        camelCase: true,
+        numbers: true
+      }) : style
+      const keys = Object.keys(objStyle)
+      for (const key of keys) {
+        const camelKey = splitLineToCamelCase(key.replace('.', ''))
+        objStyle[camelKey] = objStyle[key]
+        if (key !== camelKey) delete objStyle[key]
+      }
 
-    },
-    parseStyle() {
+      // 清空画布
+      const ctx = this.ctx
+      const canvas = this.canvas
+      if (!ctx || !canvas) {
+        return Promise.reject(new Error('renderToCanvas: fail canvas has not been created'))
+      }
 
+      ctx.clearRect(0, 0, this.data.width, this.data.height)
+      const {root: xom} = xmlParse(wxml)
+      const widget = new Widget(xom, objStyle)
+      const container = widget.init()
+      this.boundary = {
+        top: container.layoutBox.top,
+        left: container.layoutBox.left,
+        width: container.computedStyle.width,
+        height: container.computedStyle.height,
+      }
+      const draw = new Draw(canvas, ctx)
+      await draw.drawNode(container)
+      return Promise.resolve(container)
     },
-    computeLayout() {
 
-    },
-    render() {
-
-    },
+    canvasToTempFilePath(args = {}) {
+      return new Promise((resolve, reject) => {
+        const {
+          top, left, width, height
+        } = this.boundary
+        wx.canvasToTempFilePath({
+          x: left,
+          y: top,
+          width,
+          height,
+          destWidth: width * this.dpr,
+          destHeight: height * this.dpr,
+          canvas: this.canvas,
+          fileType: args.fileType || 'png',
+          quality: args.quality || 1,
+          success: resolve,
+          fail: reject
+        })
+      })
+    }
   }
 })

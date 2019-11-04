@@ -35,19 +35,12 @@ module.exports = {
     mode: 'production',
     output: {
       filename: '[name].js',
-      libraryTarget: 'commonjs2',
+      libraryTarget: 'umd',
     },
-    target: 'node',
+    target: 'web',
     externals: [nodeExternals()], // 忽略 node_modules
     module: {
-      rules: [{
-        test: /\.js$/i,
-        use: [
-          'babel-loader',
-          'eslint-loader'
-        ],
-        exclude: /node_modules/
-      }],
+
     },
     resolve: {
       modules: [src, 'node_modules'],
@@ -67,5 +60,5 @@ module.exports = {
     }
   },
 
-  copy: ['./assets', './utils.js'], // 将会复制到目标目录
+  copy: ['./utils.js'], // 将会复制到目标目录
 }
