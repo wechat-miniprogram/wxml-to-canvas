@@ -1,6 +1,6 @@
 {
-  "name": "widget-to-canvas",
-  "version": "1.0.3",
+  "name": "wxml-to-canvas",
+  "version": "1.0.0",
   "description": "",
   "main": "miniprogram_dist/index.js",
   "scripts": {
