@@ -1,6 +1,6 @@
 {
   "name": "wxml-to-canvas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "miniprogram_dist/index.js",
   "scripts": {
@@ -58,7 +58,6 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "css-to-object": "^1.1.0",
     "widget-ui": "^1.0.2"
   }
 }

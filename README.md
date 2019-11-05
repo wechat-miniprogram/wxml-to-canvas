@@ -3,7 +3,7 @@
 [![](https://img.shields.io/npm/v/wxml-to-canvas)](https://www.npmjs.com/package/wxml-to-canvas)
 [![](https://img.shields.io/npm/l/wxml-to-canvas)](https://github.com/wechat-miniprogram/wxml-to-canvas)
 
-小程序内通过静态模板和样式绘制 canvas ，导出图片，可用于生成分享图等场景。[代码片段]()
+小程序内通过静态模板和样式绘制 canvas ，导出图片，可用于生成分享图等场景。[代码片段](https://developers.weixin.qq.com/s/r6UBlEm17pc6)
 
 ## 使用方法
 
@@ -126,18 +126,6 @@ const style = {
 
 渲染到 canvas，传入 wxml 模板 和 style 对象，返回的容器对象包含布局和样式信息。
 
-style 也可直接传入 CSS 字符串。 如
-
-`
- .container {
-    width: 300px;
-    height: 200px;
-    flexDirection: row;
-    justifyContent: space-around;
-    backgroundColor: #ccc;
-    alignItems: center;
-  }
-`
 #### f2. `canvasToTempFilePath({fileType, quality}): Promise`
 
 提取画布中容器所在区域内容生成相同大小的图片，返回临时文件地址。

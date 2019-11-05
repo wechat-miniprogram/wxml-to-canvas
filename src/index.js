@@ -1,9 +1,7 @@
 
-const cssToObj = require('css-to-object')
 const xmlParse = require('./xml-parser')
 const {Widget} = require('./widget')
 const {Draw} = require('./draw')
-const {splitLineToCamelCase} = require('./utils')
 
 Component({
   properties: {
@@ -37,16 +35,6 @@ Component({
   methods: {
     async renderToCanvas(args) {
       const {wxml, style} = args
-      const objStyle = typeof style === 'string' ? cssToObj(style, {
-        camelCase: true,
-        numbers: true
-      }) : style
-      const keys = Object.keys(objStyle)
-      for (const key of keys) {
-        const camelKey = splitLineToCamelCase(key.replace('.', ''))
-        objStyle[camelKey] = objStyle[key]
-        if (key !== camelKey) delete objStyle[key]
-      }
 
       // 清空画布
       const ctx = this.ctx
@@ -58,7 +46,7 @@ Component({
       ctx.clearRect(0, 0, this.data.width, this.data.height)
       const {root: xom} = xmlParse(wxml)
 
-      const widget = new Widget(xom, objStyle)
+      const widget = new Widget(xom, style)
       const container = widget.init()
       this.boundary = {
         top: container.layoutBox.top,
