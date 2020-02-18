@@ -85,12 +85,12 @@ class Draw {
       backgroundColor = 'transparent'
     } = style
 
+    if (typeof lineHeight === 'string') { // 2em
+      lineHeight = Math.ceil(parseFloat(lineHeight.replace('em')) * fontSize)
+    }
     if (!text || (lineHeight > h)) return
 
     ctx.save()
-    if (lineHeight) { // 2em
-      lineHeight = Math.ceil(parseFloat(lineHeight.replace('em')) * fontSize)
-    }
     ctx.textBaseline = 'top'
     ctx.font = `${fontSize}px sans-serif`
     ctx.textAlign = textAlign
