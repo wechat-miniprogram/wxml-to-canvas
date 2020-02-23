@@ -16,26 +16,30 @@ Component({
   },
   lifetimes: {
     attached() {
-      const dpr = wx.getSystemInfoSync().pixelRatio
-      const query = this.createSelectorQuery()
-      this.dpr = dpr
-      query.select('#canvas')
-        .fields({node: true, size: true})
-        .exec(res => {
-          const canvas = res[0].node
-          const ctx = canvas.getContext('2d')
-          canvas.width = res[0].width * dpr
-          canvas.height = res[0].height * dpr
-          ctx.scale(dpr, dpr)
-          this.ctx = ctx
-          this.canvas = canvas
-        })
+      this.initCtx = new Promise(resolve => {
+        const dpr = wx.getSystemInfoSync().pixelRatio
+        const query = this.createSelectorQuery()
+        this.dpr = dpr
+        query.select('#canvas')
+          .fields({node: true, size: true})
+          .exec(res => {
+            const canvas = res[0].node
+            const ctx = canvas.getContext('2d')
+            canvas.width = res[0].width * dpr
+            canvas.height = res[0].height * dpr
+            ctx.scale(dpr, dpr)
+            this.ctx = ctx
+            this.canvas = canvas
+            resolve()
+          })
+      })
     }
   },
   methods: {
     async renderToCanvas(args) {
-      const {wxml, style} = args
+      await this.initCtx
 
+      const {wxml, style} = args
       // 清空画布
       const ctx = this.ctx
       const canvas = this.canvas
