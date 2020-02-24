@@ -2,6 +2,7 @@
 const xmlParse = require('./xml-parser')
 const {Widget} = require('./widget')
 const {Draw} = require('./draw')
+const {compareVersion} = require('./utils')
 
 Component({
   properties: {
@@ -14,22 +15,35 @@ Component({
       value: 300
     }
   },
+  data: {
+    use2dCanvas: false // 2.9.2 后可用canvas 2d 接口
+  },
   lifetimes: {
+    created() {
+      this._systemInfo = wx.getSystemInfoSync()
+      const sdkVersion = this.systemInfo.SDKVersion
+      this._dpr = this._systemInfo.pixelRatio
+      const use2dCanvas = compareVersion(sdkVersion, '2.9.2') >= 0
+      this.setData({use2dCanvas})
+    },
+
     attached() {
-      const dpr = wx.getSystemInfoSync().pixelRatio
-      const query = this.createSelectorQuery()
-      this.dpr = dpr
-      query.select('#canvas')
-        .fields({node: true, size: true})
-        .exec(res => {
-          const canvas = res[0].node
-          const ctx = canvas.getContext('2d')
-          canvas.width = res[0].width * dpr
-          canvas.height = res[0].height * dpr
-          ctx.scale(dpr, dpr)
-          this.ctx = ctx
-          this.canvas = canvas
-        })
+      if (this.data.use2dCanvas) {
+        const query = this.createSelectorQuery()
+        const dpr = this._dpr
+        query.select('#canvas')
+          .fields({node: true, size: true})
+          .exec(res => {
+            const canvas = res[0].node
+            const ctx = canvas.getContext('2d')
+            canvas.width = res[0].width * dpr
+            canvas.height = res[0].height * dpr
+            ctx.scale(dpr, dpr)
+            this.ctx = ctx
+            this.canvas = canvas
+          })
+      } else {}
+      
     }
   },
   methods: {
