@@ -1,7 +1,8 @@
 class Draw {
-  constructor(canvas, context) {
-    this.canvas = canvas
+  constructor(context, canvas, use2dCanvas = false) {
     this.ctx = context
+    this.canvas = canvas || null
+    this.use2dCanvas = use2dCanvas
   }
 
   roundRect(x, y, w, h, r, fill = true, stroke = false) {
@@ -50,6 +51,7 @@ class Draw {
     await new Promise((resolve, reject) => {
       const ctx = this.ctx
       const canvas = this.canvas
+
       const {
         borderRadius = 0
       } = style
@@ -59,14 +61,46 @@ class Draw {
       ctx.save()
       this.roundRect(x, y, w, h, borderRadius, false, false)
       ctx.clip()
-      const Image = canvas.createImage()
-      Image.onload = () => {
-        ctx.drawImage(Image, x, y, w, h)
-        ctx.restore()
-        resolve()
+
+      const _drawImage = (img) => {
+        if (this.use2dCanvas) {
+          const Image = canvas.createImage()
+          Image.onload = () => {
+            ctx.drawImage(Image, x, y, w, h)
+            ctx.restore()
+            resolve()
+          }
+          Image.onerror = () => { reject(new Error(`createImage fail: ${img}`)) }
+          Image.src = img
+        } else {
+          ctx.drawImage(img, x, y, w, h)
+          ctx.restore()
+          resolve()
+        }
       }
-      Image.onerror = () => { reject() }
-      Image.src = img
+
+      const isTempFile = /^wxfile:\/\//.test(img)
+      const isNetworkFile = /^https?:\/\//.test(img)
+
+      if (isTempFile) {
+        _drawImage(img)
+      } else if (isNetworkFile) {
+        wx.downloadFile({
+          url: img,
+          success(res) {
+            if (res.statusCode === 200) {
+              _drawImage(res.tempFilePath)
+            } else {
+              reject(new Error(`downloadFile:fail ${img}`))
+            }
+          },
+          fail() {
+            reject(new Error(`downloadFile:fail ${img}`))
+          }
+        })
+      } else {
+        reject(new Error(`image format error: ${img}`))
+      }
     })
   }
 
