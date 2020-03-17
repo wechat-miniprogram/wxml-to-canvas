@@ -5,6 +5,7 @@
 
 小程序内通过静态模板和样式绘制 canvas ，导出图片，可用于生成分享图等场景。[代码片段](https://developers.weixin.qq.com/s/r6UBlEm17pc6)
 
+
 ## 使用方法
 
 #### Step1. npm 安装，参考 [小程序 npm 支持](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)
@@ -31,6 +32,14 @@ npm install --save wxml-to-canvas
 </video>
 <image src="{{src}}" style="width: {{width}}px; height: {{height}}px"></image>
 ```
+
+##### 属性列表
+
+| 属性            | 类型    | 默认值  | 必填 | 说明                   |
+| --------------- | ------- | ------- | ---- | ---------------------- |
+| width           | Number  |   400      | 否   | 画布宽度           |
+| height           | Number  |   300      | 否   | 画布高度           |
+
 
 #### Step4. js 获取实例
 
