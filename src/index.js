@@ -18,7 +18,7 @@ Component({
     }
   },
   data: {
-    use2dCanvas: false // 2.9.2 后可用canvas 2d 接口
+    use2dCanvas: false, // 2.9.2 后可用canvas 2d 接口
   },
   lifetimes: {
     attached() {
@@ -97,6 +97,8 @@ Component({
           y: top,
           width,
           height,
+          destWidth: width * this.dpr,
+          destHeight: height * this.dpr,
           canvasId,
           fileType: args.fileType || 'png',
           quality: args.quality || 1,
