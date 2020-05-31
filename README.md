@@ -157,7 +157,7 @@ const style = {
 
 `fileType` 支持 `jpg`、`png` 两种格式，quality 为图片的质量，目前仅对 jpg 有效。取值范围为 (0, 1]，不在范围内时当作 1.0 处理。
 
-#### f3. `getImage({wxml, style}): Promise`
+#### f3. `wxmlToCanvasToImg({wxml, style}): Promise`
 
 串联wxml渲染到canvas和提取画布内容生成图片两个操作
 
