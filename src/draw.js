@@ -1,3 +1,4 @@
+const hexToRgba = require('./hex-to-rgba')
 class Draw {
   constructor(context, canvas, use2dCanvas = false) {
     this.ctx = context
@@ -105,8 +106,9 @@ class Draw {
   }
 
   // eslint-disable-next-line complexity
-  drawText(text, box, style) {
+  drawText(text, box, style, element) {
     const ctx = this.ctx
+    const parent = element.parent
     let {
       left: x, top: y, width: w, height: h
     } = box
@@ -135,6 +137,9 @@ class Draw {
 
     // 文字颜色
     ctx.fillStyle = color
+    if (!this.use2dCanvas) { // 低版本不支持八位带透明度hex格式，不支持颜色：#0000004c
+      ctx.setFillStyle(hexToRgba(color))
+    }
 
     // 水平布局
     switch (textAlign) {
@@ -172,6 +177,7 @@ class Draw {
     // 不超过一行
     if (textWidth <= w) {
       ctx.fillText(text, x, y + inlinePaddingTop)
+      ctx.restore()
       return
     }
 
@@ -189,14 +195,15 @@ class Draw {
         ctx.fillText(line, x, y + inlinePaddingTop)
         y += lineHeight
         line = ch
-        if ((y + lineHeight) > (_y + h)) break
+        // if ((y + lineHeight) > (_y + h)) break
+        if ((y + lineHeight) > (_y + parent.layoutBox.height)) break
       } else {
         line = testLine
       }
     }
 
     // 避免溢出
-    if ((y + lineHeight) <= (_y + h)) {
+    if ((y + lineHeight) <= (_y + parent.layoutBox.height)) { // 不超过父元素的高度允许换行
       ctx.fillText(line, x, y + inlinePaddingTop)
     }
     ctx.restore()
@@ -210,7 +217,7 @@ class Draw {
     } else if (name === 'image') {
       await this.drawImage(src, layoutBox, computedStyle)
     } else if (name === 'text') {
-      this.drawText(text, layoutBox, computedStyle)
+      this.drawText(text, layoutBox, computedStyle, element)
     }
     const childs = Object.values(element.children)
     for (const child of childs) {
