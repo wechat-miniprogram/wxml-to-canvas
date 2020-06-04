@@ -70,7 +70,7 @@ Component({
         const childStyle = getStyle(style, child)
         const childClassName = child.attributes.class
         textCtx.draw(false)
-        textCtx.font = `normal normal normal normal ${childStyle.fontSize}px / ${childStyle.lineHeight || childStyle.height}px "PingFang SC"`
+        textCtx.font = `normal normal ${childStyle.fontWeight || 400} normal ${childStyle.fontSize}px / ${childStyle.lineHeight || childStyle.height}px "PingFang SC"`
         const metrics = textCtx.measureText(child.content)
 
         const canvasMeasureWidth = metrics.width
