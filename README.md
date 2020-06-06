@@ -28,7 +28,7 @@ npm install --save wxml-to-canvas
 
 ```
 <video class="video" src="{{src}}">
-  <wxml-to-canvas class="widget"></wxml-to-canvas>
+  <wxml-to-canvas class="widget" bind:canvasReady="getImage"></wxml-to-canvas>
 </video>
 <image src="{{src}}" style="width: {{width}}px; height: {{height}}px"></image>
 ```
@@ -160,6 +160,11 @@ const style = {
 #### f3. `wxmlToCanvasToImg({wxml, style}): Promise`
 
 串联wxml渲染到canvas和提取画布内容生成图片两个操作
+
+#### f4. `canvasReady`
+
+组件中canvas初始化完成的回调函数，可结合`wxmlToCanvasToImg`搭配使用，实现应用组件页面中立即得到图片。
+
 
 ## 支持的 css 属性
 

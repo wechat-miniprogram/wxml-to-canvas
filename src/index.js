@@ -25,8 +25,18 @@ Component({
       const {SDKVersion, pixelRatio: dpr} = wx.getSystemInfoSync()
       const use2dCanvas = compareVersion(SDKVersion, '2.9.2') >= 0
       this.dpr = dpr
-      this.setData({use2dCanvas}, () => {
+      this.setData({use2dCanvas}, async () => {
+        await this.getCanvasInfo(use2dCanvas, canvasId)
+        this.triggerEvent('canvasReady', {}, {}) // canvas初始化完成的回调，可以开始绘制
+      })
+    }
+  },
+  methods: {
+    // 获取canvas context等信息
+    getCanvasInfo(use2dCanvas, canvasId) {
+      return new Promise((resolve) => {
         if (use2dCanvas) {
+          const dpr = this.dpr
           const query = this.createSelectorQuery()
           query.select(`#${canvasId}`)
               .fields({node: true, size: true})
@@ -38,52 +48,15 @@ Component({
                 ctx.scale(dpr, dpr)
                 this.ctx = ctx
                 this.canvas = canvas
+                console.log('exec')
+                resolve()
               })
         } else {
           this.ctx = wx.createCanvasContext(canvasId, this)
+          resolve()
         }
       })
-    }
-  },
-  methods: {
-    // 获取文本xom节点
-    getText(xom, returnArray) {
-      if (xom.name === 'text') {
-        returnArray.push(xom)
-      } else if(xom.name === 'view') {
-        for (const child of xom.children) {
-          this.getText(child, returnArray)
-        }
-      }
     },
-    // 重置文本宽度
-    resetTextWidth(xom, style) {
-      let textArray = []
-      this.getText(xom, textArray)
-      const getStyle = function (style, ele) {
-        const className = ele.attributes.class
-        const textStyle = style[className]
-        return textStyle
-      }
-      const textCtx = wx.createCanvasContext('measure-text')
-      for (const child of textArray) {
-        const childStyle = getStyle(style, child)
-        const childClassName = child.attributes.class
-        textCtx.draw(false)
-        textCtx.font = `normal normal ${childStyle.fontWeight || 400} normal ${childStyle.fontSize}px / ${childStyle.lineHeight || childStyle.height}px "PingFang SC"`
-        const metrics = textCtx.measureText(child.content)
-
-        const canvasMeasureWidth = metrics.width
-        if (metrics.width > childStyle.width) { // canvas 测量结果比给定的宽度值大
-          let width = canvasMeasureWidth
-          if (typeof childStyle.maxWidth !== 'undefined') {
-            width = childStyle.maxWidth
-          }
-          style[childClassName].width = Math.ceil(width)
-        }
-      }
-    },
-
     async renderToCanvas(args) {
       const data = await this.initCanvas(args)
       const {draw, container, ctx} = data
@@ -120,8 +93,6 @@ Component({
       ctx.clearRect(0, 0, this.data.width, this.data.height)
       const {root: xom} = xmlParse(wxml)
 
-      this.resetTextWidth(xom, style)
-
       const widget = new Widget(xom, style)
       const container = widget.init()
       this.boundary = {
@@ -145,10 +116,8 @@ Component({
 
     // wxml=>canvas=>Img
     async wxmlToCanvasToImg(args) {
-      return this.drawToCanvas(args)
-          .then(() => {
-            return this.canvasToTempFilePath()
-          })
+      await this.drawToCanvas(args)
+      return this.canvasToTempFilePath()
     },
 
     canvasToTempFilePath(args = {}) {
