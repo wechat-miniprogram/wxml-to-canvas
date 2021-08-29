@@ -47,7 +47,7 @@ Component({
   },
   methods: {
     async renderToCanvas(args) {
-      const {wxml, style} = args
+      const {wxml, style, shouldClearRect = true} = args
       const ctx = this.ctx
       const canvas = this.canvas
       const use2dCanvas = this.data.use2dCanvas
@@ -56,7 +56,9 @@ Component({
         return Promise.reject(new Error('renderToCanvas: fail canvas has not been created'))
       }
 
-      ctx.clearRect(0, 0, this.data.width, this.data.height)
+      if (shouldClearRect) {
+        ctx.clearRect(0, 0, this.data.width, this.data.height)
+      }
       const {root: xom} = xmlParse(wxml)
 
       const widget = new Widget(xom, style)
